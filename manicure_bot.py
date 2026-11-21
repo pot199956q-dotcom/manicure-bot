@@ -552,14 +552,17 @@ def main():
 
     app = Application.builder().token(TOKEN).post_init(post_init).build()
 
-    # Нижние кнопки
+    # Нижние кнопки (только для меню, не для записи)
     app.add_handler(MessageHandler(
-        filters.Regex("^(📅 Записаться|📋 Мои записи|❌ Отменить запись)$"),
+        filters.Regex("^(📋 Мои записи|❌ Отменить запись)$"),
         menu_handler
     ))
 
     conv = ConversationHandler(
-        entry_points=[CommandHandler("start", start)],
+        entry_points=[
+            CommandHandler("start", start),
+            MessageHandler(filters.Regex("^📅 Записаться$"), menu_handler),
+        ],
         states={
             NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_name)],
             PHONE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_phone)],
